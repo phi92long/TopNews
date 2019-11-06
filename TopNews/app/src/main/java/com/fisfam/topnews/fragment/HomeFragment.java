@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.facebook.shimmer.ShimmerFrameLayout;
+import com.fisfam.topnews.R;
 
 public class HomeFragment extends Fragment {
 
@@ -24,8 +25,10 @@ public class HomeFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Toast.makeText(getContext(), "HomeFragment launched", Toast.LENGTH_LONG).show();
-        return super.onCreateView(inflater, container, savedInstanceState);
+        mRootView = inflater.inflate(R.layout.fragment_home, container, false);
+
+        initView();
+        return mRootView;
     }
 
     @Override
@@ -41,5 +44,14 @@ public class HomeFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+    }
+
+    private void initView() {
+        mShimmerFrameLayout = mRootView.findViewById(R.id.shimmer_home);
+        mShimmerFrameLayout.setVisibility(View.VISIBLE);
+        mShimmerFrameLayout.startShimmer();
+
+        mSwipeRefreshLayout = mRootView.findViewById(R.id.swipe_refresh);
+        mSwipeRefreshLayout.post(() -> mSwipeRefreshLayout.setRefreshing(true));
     }
 }
