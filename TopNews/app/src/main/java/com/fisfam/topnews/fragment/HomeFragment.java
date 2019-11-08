@@ -9,25 +9,29 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.fisfam.topnews.R;
+import com.fisfam.topnews.adapter.HomeAdapter;
+import com.fisfam.topnews.pojo.Articles;
 
 public class HomeFragment extends Fragment {
 
     private View mRootView;
-    private RecyclerView mRecyclerView;
+    private RecyclerView mHomeRecyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ShimmerFrameLayout mShimmerFrameLayout;
+    private HomeAdapter mHomeAdapter;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.fragment_home, container, false);
 
-        initView();
+        initUiComponents();
         return mRootView;
     }
 
@@ -46,12 +50,33 @@ public class HomeFragment extends Fragment {
         super.onDestroy();
     }
 
-    private void initView() {
+    private void initUiComponents() {
         mShimmerFrameLayout = mRootView.findViewById(R.id.shimmer_home);
-        mShimmerFrameLayout.setVisibility(View.VISIBLE);
-        mShimmerFrameLayout.startShimmer();
+        //mShimmerFrameLayout.setVisibility(View.VISIBLE);
+        //mShimmerFrameLayout.startShimmer();
 
         mSwipeRefreshLayout = mRootView.findViewById(R.id.swipe_refresh);
-        mSwipeRefreshLayout.post(() -> mSwipeRefreshLayout.setRefreshing(true));
+        //mSwipeRefreshLayout.post(() -> mSwipeRefreshLayout.setRefreshing(true));
+
+        mHomeRecyclerView = mRootView.findViewById(R.id.home_recycler_view);
+        mHomeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mHomeRecyclerView.setHasFixedSize(true);
+
+        // inject the recycler view so adapter can check if last item reached.
+        //TODO: Well there has to be a better way to check this?
+        mHomeAdapter = new HomeAdapter(getActivity(), mHomeRecyclerView);
+        mHomeRecyclerView.setAdapter(mHomeAdapter);
+
+        mHomeAdapter.setOnLoadMoreListener(() -> {
+            //TODO: load more articles
+        });
+
+        mHomeAdapter.setOnItemClickListener((view, articles, position) -> {
+            //TODO: navigate to articles details activity
+        });
+
+        mSwipeRefreshLayout.setOnRefreshListener(() -> {
+            //TODO: cancel ongoing call to News API, delete the data, request new page
+        });
     }
 }

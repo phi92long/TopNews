@@ -24,6 +24,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.fisfam.topnews.fragment.HomeFragment;
 import com.fisfam.topnews.fragment.SavedFragment;
 import com.fisfam.topnews.fragment.TopicFragment;
+import com.fisfam.topnews.pojo.Articles;
 import com.fisfam.topnews.pojo.News;
 import com.fisfam.topnews.utils.UiTools;
 
@@ -205,6 +206,13 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<News> call, Response<News> response) {
                 News news = response.body();
                 Log.d(TAG, "Received Headlines = " + news);
+
+                if (news == null) {
+                    Log.e(TAG, "onResponse: no news is good news");
+                }
+                for (Articles articles : news.getArticles()) {
+                    Log.d(TAG, "Articles: " + articles.getTitle());
+                }
             }
 
             @Override

@@ -18,16 +18,16 @@
         android:orientation="vertical">
 
         <ImageView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_marginBottom="@dimen/spacing_middle"
-            android:src="@drawable/logo" />
+            android:src="@drawable/baby" />
 
 
         <ImageView
-            android:layout_width="55dp"
-            android:layout_height="15dp"
-            android:src="@drawable/logo_name_small" />
+            android:layout_width="100dp"
+            android:layout_height="60dp"
+            android:src="@drawable/baby_text" />
 
     </LinearLayout>
 
