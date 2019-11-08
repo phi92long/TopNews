@@ -20,7 +20,7 @@ public class Articles {
     @SerializedName("content")
     private String content;
 
-    private class Source {
+    public class Source {
         @SerializedName("id")
         private String id;
         @SerializedName("name")

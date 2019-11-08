@@ -2,6 +2,7 @@ package com.fisfam.topnews.adapter;
 
 import android.appwidget.AppWidgetProviderInfo;
 import android.content.Context;
+import android.view.LayoutInflater;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +13,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.fisfam.topnews.R;
 import com.fisfam.topnews.pojo.Articles;
+import com.fisfam.topnews.pojo.Section;
+import com.fisfam.topnews.pojo.TopicList;
+import com.fisfam.topnews.utils.UiTools;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,19 +31,57 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List mItems = new ArrayList<>();
     private OnLoadMoreListener mOnLoadMoreListener;
     private OnItemClickListener mOnItemClickListener;
+    //TODO: WeakReference
+    private Context mContext;
 
     public HomeAdapter(final Context context, final RecyclerView recyclerView) {
         super();
+        mContext = context;
     }
 
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return null;
+        RecyclerView.ViewHolder vh;
+
+        if (viewType == VIEW_TYPE_ARTICLES) {
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_articles, parent, false);
+            vh = new ItemArticlesViewHolder(v);
+        } else if (viewType == VIEW_TYPE_SECTION) {
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_section_title, parent, false);
+            vh = new ItemSectionViewHolder(v);
+        } else {
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_section_topic_home, parent, false);
+            vh = new ItemTopicViewHolder(v);
+        }
+
+        return vh;
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        Object item = mItems.get(position);
+
+        if (holder instanceof ItemArticlesViewHolder) {
+            final Articles articles = (Articles) item;
+            final ItemArticlesViewHolder vh = (ItemArticlesViewHolder) holder;
+            vh.title.setText(articles.getTitle());
+            vh.date.setText(articles.getPublishedAt());
+            vh.source.setText(articles.getSource().getName());
+            UiTools.displayImageThumb(mContext, vh.image, articles.getUrlToImage(), 0.5f);
+            vh.rippleLayout.setOnClickListener(view -> {
+                if (mOnItemClickListener != null) {
+                    mOnItemClickListener.onItemArticlesClick(view, articles, position);
+                }
+            });
+        } else if (holder instanceof ItemSectionViewHolder) {
+            Section section = (Section) item;
+            ItemSectionViewHolder vh = (ItemSectionViewHolder) holder;
+            vh.title.setText(section.getTitle());
+        }
     }
 
     @Override
@@ -49,7 +92,7 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             return VIEW_TYPE_ARTICLES;
         }
 
-/*        if (o instanceof TopicList) {
+        if (o instanceof TopicList) {
             return VIEW_TYPE_TOPIC;
         }
 
@@ -57,11 +100,11 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             return VIEW_TYPE_SECTION;
         }
 
-        if (o instanceof Progress) {
+/*        if (o instanceof Progress) {
             return VIEW_TYPE_PROGRESS;
         }*/
 
-        return 0;
+        return -1;
     }
 
     @Override
@@ -105,6 +148,12 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             super(v);
             title = v.findViewById(R.id.section_title);
         }
+    }
+
+    public void addData(final Object o) {
+        mItems.add(o);
+        int positionStart = getItemCount();
+        notifyItemInserted(positionStart);
     }
 
     public void setOnLoadMoreListener(OnLoadMoreListener onLoadMoreListener) {
