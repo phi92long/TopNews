@@ -42,7 +42,8 @@ public class UiTools {
 
     public static void displayImageThumb(Context context, ImageView img, String url, float thumb) {
         try {
-            Glide.with(context.getApplicationContext()).load(url)
+            Glide.with(context.getApplicationContext())
+                    .load(url)
                     .transition(withCrossFade())
                     //TODO: implement SharePref
                     //.diskCacheStrategy(new SharedPref(ctx).getImageCache() ? DiskCacheStrategy.ALL : DiskCacheStrategy.NONE)

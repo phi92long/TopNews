@@ -2,6 +2,7 @@ package com.fisfam.topnews.adapter;
 
 import android.appwidget.AppWidgetProviderInfo;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.TextureView;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.fisfam.topnews.R;
 import com.fisfam.topnews.pojo.Articles;
@@ -21,6 +23,8 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import static androidx.constraintlayout.widget.Constraints.TAG;
+
 public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int VIEW_TYPE_ARTICLES = 100;
@@ -31,12 +35,13 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List mItems = new ArrayList<>();
     private OnLoadMoreListener mOnLoadMoreListener;
     private OnItemClickListener mOnItemClickListener;
-    //TODO: WeakReference
     private Context mContext;
+    private boolean mIsLoading;
 
     public HomeAdapter(final Context context, final RecyclerView recyclerView) {
         super();
-        mContext = context;
+        mContext = new WeakReference<>(context).get();
+        initLastItemDetector(recyclerView);
     }
 
     @NonNull
@@ -71,7 +76,11 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             vh.title.setText(articles.getTitle());
             vh.date.setText(articles.getPublishedAt());
             vh.source.setText(articles.getSource().getName());
-            UiTools.displayImageThumb(mContext, vh.image, articles.getUrlToImage(), 0.5f);
+            if (mContext != null) {
+                UiTools.displayImageThumb(mContext, vh.image, articles.getUrlToImage(), 0.5f);
+            } else {
+                Log.e(TAG, "onBindViewHolder: Context must not be null");
+            }
             vh.rippleLayout.setOnClickListener(view -> {
                 if (mOnItemClickListener != null) {
                     mOnItemClickListener.onItemArticlesClick(view, articles, position);
@@ -127,6 +136,7 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             date = v.findViewById(R.id.date);
             source = v.findViewById(R.id.txt_type);
             rippleLayout = v.findViewById(R.id.lyt_articles);
+            image = v.findViewById(R.id.image_articles);
         }
     }
 
@@ -154,6 +164,32 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         mItems.add(o);
         int positionStart = getItemCount();
         notifyItemInserted(positionStart);
+    }
+
+    public void resetData() {
+        mItems.clear();
+        notifyDataSetChanged();
+    }
+
+    private void initLastItemDetector(RecyclerView recyclerView) {
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                final LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                if (layoutManager == null) {
+                    Log.e(TAG, "lastItemViewDetector: Layout Manager is null");
+                    return;
+                }
+
+                int lastPos = layoutManager.findLastVisibleItemPosition();
+                if (!mIsLoading && lastPos == getItemCount() - 1 && mOnLoadMoreListener != null) {
+                    mOnLoadMoreListener.onLoadMore();
+                    mIsLoading = true;
+                }
+            }
+        });
     }
 
     public void setOnLoadMoreListener(OnLoadMoreListener onLoadMoreListener) {
