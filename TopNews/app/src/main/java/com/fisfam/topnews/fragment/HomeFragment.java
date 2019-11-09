@@ -6,8 +6,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -23,6 +25,7 @@ import com.fisfam.topnews.adapter.HomeAdapter;
 import com.fisfam.topnews.pojo.Articles;
 import com.fisfam.topnews.pojo.News;
 import com.fisfam.topnews.pojo.Section;
+import com.fisfam.topnews.utils.NetworkCheck;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -45,12 +48,8 @@ public class HomeFragment extends Fragment {
 
         initUiComponents();
         showRefreshing(true);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                requestData();
-            }
-        }, 500);
+
+        new Handler().postDelayed(this::requestData, 500);
 
         return mRootView;
     }
@@ -101,6 +100,9 @@ public class HomeFragment extends Fragment {
     }
 
     private void requestData() {
+        // Disable failed view if it was enabled from last request
+        showFailedView(false, "", R.drawable.img_failed);
+
         showRefreshing(true);
 
         NewsService newsService =
@@ -140,10 +142,29 @@ public class HomeFragment extends Fragment {
 
     private void handleFailRequest() {
         showRefreshing(false);
+        if (NetworkCheck.isNetworkAvailable(getActivity())){
+            showFailedView(true, getString(R.string.failed_text), R.drawable.img_failed);
+        } else {
+            showFailedView(true, getString(R.string.no_internet_text), R.drawable.img_no_internet);
+        }
+    }
+
+    private void showFailedView(boolean show, String message, @DrawableRes int icon) {
+        View lyt_failed = mRootView.findViewById(R.id.lyt_failed);
+
+        ((ImageView) mRootView.findViewById(R.id.failed_icon)).setImageResource(icon);
+        ((TextView) mRootView.findViewById(R.id.failed_message)).setText(message);
+        if (show) {
+            mHomeRecyclerView.setVisibility(View.INVISIBLE);
+            lyt_failed.setVisibility(View.VISIBLE);
+        } else {
+            mHomeRecyclerView.setVisibility(View.VISIBLE);
+            lyt_failed.setVisibility(View.GONE);
+        }
+        (mRootView.findViewById(R.id.failed_retry)).setOnClickListener(view -> requestData());
     }
 
     private void showRefreshing(final boolean show) {
-        //why on another thread?
         mSwipeRefreshLayout.post(() -> mSwipeRefreshLayout.setRefreshing(show));
         if (show) {
             mShimmerFrameLayout.setVisibility(View.VISIBLE);
