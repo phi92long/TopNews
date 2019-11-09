@@ -24,6 +24,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.fisfam.topnews.fragment.HomeFragment;
 import com.fisfam.topnews.fragment.SavedFragment;
 import com.fisfam.topnews.fragment.TopicFragment;
+import com.fisfam.topnews.pojo.Articles;
 import com.fisfam.topnews.pojo.News;
 import com.fisfam.topnews.utils.UiTools;
 
@@ -36,7 +37,6 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final String API_KEY = "2ccc7b03852442ea9cbc29b58ee7903a";
     private Toolbar mToolbar;
     private ActionBar mActionBar;
     private DrawerLayout mDrawer;
@@ -49,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
         mDrawer = findViewById(R.id.drawer);
         initToolbar();
         loadFragment(new HomeFragment());
-        testApi();
 
         //TODO: listen to network
 
@@ -193,24 +192,5 @@ public class MainActivity extends AppCompatActivity {
         mActionBar.setTitle(title);
         mDrawer.closeDrawers();
         if (fragment != null) loadFragment(fragment);
-    }
-
-    private void testApi() {
-        NewsService newsService = NewsServiceGenerator.createService(NewsService.class, API_KEY);
-        Call<News> callNews = newsService.getTopHeadlines(
-                "de", null, null, null, 5, 0);
-
-        callNews.enqueue(new Callback<News>() {
-            @Override
-            public void onResponse(Call<News> call, Response<News> response) {
-                News news = response.body();
-                Log.d(TAG, "Received Headlines = " + news);
-            }
-
-            @Override
-            public void onFailure(Call<News> call, Throwable t) {
-                Log.e(TAG, t.toString());
-            }
-        });
     }
 }

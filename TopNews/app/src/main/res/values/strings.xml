@@ -1,18 +1,11 @@
 <resources>
     <string name="app_name">Top News</string>
 
+    <string name="api_key">2ccc7b03852442ea9cbc29b58ee7903a</string>
+
     <string name="content_about">Top News is an android news application.
         Developed by Hoang Hai Ngo. Elektrobit Automotive GmbH
     </string>
-
-    <!--ADMOB property -->
-    <string name="admob_app_id">ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX</string>
-    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="interstitial_ad_unit_id">ca-app-pub-3940256099942544/1033173712</string>
-
-    <!--GDPR property -->
-    <string name="publisher_id">pub-XXXXXXXXXXXXXXXX</string>
-    <string name="privacy_policy_url">http://dream-space.web.id/</string>
 
     <string name="share_text">
         Read News \'%1$s\'%n
