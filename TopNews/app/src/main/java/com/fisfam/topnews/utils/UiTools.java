@@ -12,13 +12,13 @@ import android.view.Window;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.fisfam.topnews.R;
 
-import static androidx.constraintlayout.widget.Constraints.TAG;
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
 public class UiTools {
+
+    private static final String TAG = UiTools.class.getSimpleName();
 
     public static void showDialogAbout(Context context) {
         final Dialog dialog = new Dialog(context);
